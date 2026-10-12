@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const DAY=86400000, VERSION="1.6.0", KEY="todoSharkV1";
+const DAY=86400000, VERSION="1.6.1", KEY="todoSharkV1";
 const SHARKS=[
 ["grey","Requin gris",0],["blacktip","Requin pointe noire",300],["whitetip","Requin pointe blanche",350],["blue","Requin bleu",420],["nurse","Requin nourrice",500],["lemon","Requin citron",600],["reef","Requin de récif",700],["coral","Requin corail",750],["zebra","Requin zèbre",850],["wobbegong","Wobbegong",950],["angel","Requin ange",1050],["bull","Requin bouledogue",1200],["thresher","Requin-renard",1400],["mako","Requin mako",1600],["hammer","Requin marteau",1800],["great-hammer","Grand requin marteau",2200],["tiger","Requin-tigre",2500],["great-white","Grand requin blanc",3000],["whale","Requin-baleine",3500],["basking","Requin pèlerin",3800],["greenland","Requin du Groenland",4200],["sixgill","Requin griset",4600],["saw","Requin-scie",5000],["frilled","Requin-lézard",5500],["goblin","Requin-lutin",6500],["megalodon","Mégalodon",10000]
 ].map(([id,name,cost])=>({id,name,cost,img:`shark-${id}.png`}));

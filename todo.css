@@ -16,3 +16,12 @@ body[data-tab='ocean'] .compactHeader{display:none}body[data-tab='ocean'] .versi
 #storageNotice{margin:5px 16px;padding:10px;border:1px solid #ffad3366;border-radius:10px;color:#ffd392;font-size:12px}#storageNotice[hidden]{display:none}.restoreLabel{display:grid;gap:8px;margin:18px 0;font-size:14px}#lists{padding:0 16px 24px}.compactToolbar{display:flex;align-items:center;gap:2px;border-bottom:1px solid var(--line);margin-bottom:5px}.compactToolbar>button{border:0;background:none;color:var(--blue);padding:0 3px;font-size:20px;flex-shrink:0}.compactDate{position:relative;flex:1;min-width:0;overflow:hidden;display:flex;align-items:center}.compactDate input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.compactDate #periodLabel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}.compactProgress{color:var(--muted);white-space:nowrap}.compactToolbar #addTask{font-size:27px}.compactToolbar #filterToggle.filtered{color:var(--aqua)}
 
 .createFab{position:fixed;right:max(20px,calc((100vw - 760px)/2 + 20px));bottom:calc(94px + env(safe-area-inset-bottom));z-index:110;width:64px;height:64px;border:0;border-radius:22px;background:#0a84ff;color:white;font-size:42px;line-height:1;box-shadow:0 8px 28px #0a84ff50}.createFab.actionFab{background:#28c76f;box-shadow:0 8px 28px #28c76f40}.createFab[hidden]{display:none}#list{padding-bottom:80px}
+
+/* v1.6.1 — stable iPhone scale and compact layout */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,a{touch-action:manipulation}
+input,select,textarea{font-size:16px!important}
+.filterRow select{padding:6px 8px;min-height:36px}
+.compactDate input{font-size:16px!important}
+#taskForm input,#taskForm select{padding:11px 12px}
+body{overflow-x:hidden}main,.page{min-width:0}dialog{overflow-x:hidden}
