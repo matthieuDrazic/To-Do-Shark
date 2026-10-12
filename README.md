@@ -1,4 +1,4 @@
-# To-do-shark V1
+# To-do-shark v1.4.0
 
 Application de listes Jour, Semaine, Mois et Océan, dérivée de SharkHabits.
 
@@ -13,4 +13,7 @@ Application de listes Jour, Semaine, Mois et Océan, dérivée de SharkHabits.
 Settings → Pages → Deploy from a branch → main → / (root). Aucun build nécessaire.
 
 ## Origine
-Océan et éditeur copiés de matthieuDrazic/shark-habits2 (ocean.js = v187.js ; ocean-editor.js = v1810.js). Les deux scripts de l’océan sont conservés à l’identique.
+Océan et éditeur copiés de matthieuDrazic/shark-habits2 (ocean.js = v187.js ; ocean-editor.js = v1810.js). L’éditeur conserve le rendu et les interactions, avec prévention du double placement et annulation du geste. L’ancienne migration de positions a été retirée.
+
+## Fiabilité v1.4.0
+Conflits entre onglets détectés ; données invalides conservées ; erreurs de stockage signalées ; export et restauration JSON dans les réglages.

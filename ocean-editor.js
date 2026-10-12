@@ -9,7 +9,7 @@ const def=id=>defs().find(d=>d.id===id);
 const placedCount=id=>data.placed.filter(p=>p.decor===id).length;
 const available=id=>Math.max(0,(data.inventory?.[id]||0)-placedCount(id));
 const vis=d=>d.img?'<img src="'+d.img+'" alt="'+d.name+'">':'<span>'+(d.emoji||'🪸')+'</span>';
-let mode='view',selected=null,drag=null,ghost=null,undo=null,suppressInventoryClick=false,editSnapshot=null;
+let mode='view',selected=null,drag=null,ghost=null,undo=null,suppressInventoryClick=false;
 
 function repairInventory(){
  data.inventory||={}; data.placed||=[];
@@ -36,7 +36,7 @@ function buy(){
  dr.innerHTML='<div class="drawerHead"><div><strong>Boutique décorations</strong><small>Un achat ajoute l’objet à ton inventaire. Il ne sera pas placé automatiquement.</small></div><button data-close-drawer>✕</button></div><div class="livingShop">'+defs().map(d=>'<button data-v1810-buy="'+d.id+'">'+vis(d)+'<b>'+d.name+'</b><small>🦷 '+d.cost+' · Possédé '+(data.inventory[d.id]||0)+'</small></button>').join('')+'</div>';
 }
 function editor(){
- mode='edit';selected=null;editSnapshot=JSON.parse(JSON.stringify(data.placed));document.getElementById('ocean')?.classList.add('v1810Editing');closeDrawer();controls();renderTray();annotate();renderTopDone();
+ mode='edit';selected=null;document.getElementById('ocean')?.classList.add('v1810Editing');closeDrawer();controls();renderTray();annotate();renderTopDone();
 }
 function renderTopDone(){
  let b=document.getElementById('v1810TopDone');
@@ -76,12 +76,12 @@ function showUndo(){
  n.innerHTML='Décoration retirée <button data-v1810-undo>Annuler</button>';setTimeout(()=>{if(Date.now()>undo?.until){n?.remove();undo=null}},5100);
 }
 function validateSelected(){if(!selected)return;save();selected=null;renderTools();annotate()}
-function finish(){save();mode='view';selected=null;editSnapshot=null;document.getElementById('ocean')?.classList.remove('v1810Editing');document.getElementById('v1810Tray')?.remove();document.getElementById('v1810Tools')?.remove();document.getElementById('v1810Undo')?.remove();document.getElementById('v1810TopDone')?.remove();controls();annotate()}
+function finish(){save();mode='view';selected=null;document.getElementById('ocean')?.classList.remove('v1810Editing');document.getElementById('v1810Tray')?.remove();document.getElementById('v1810Tools')?.remove();document.getElementById('v1810Undo')?.remove();document.getElementById('v1810TopDone')?.remove();controls();annotate()}
 
 function sceneXY(e,scene){const r=scene.getBoundingClientRect();return{x:Math.max(5,Math.min(95,(e.clientX-r.left)/r.width*100)),y:Math.max(5,Math.min(91,(e.clientY-r.top)/r.height*100))}}
 function startPlaced(e,el){
  if(mode!=='edit')return;const p=data.placed.find(x=>String(x.id)===String(el.dataset.v1810Placed));if(!p)return;
- selected=p.id;renderTools();const pt=sceneXY(e,document.getElementById('livingScene'));drag={kind:'placed',id:e.pointerId,p,el,dx:(p.x??pt.x)-pt.x,dy:(p.y??pt.y)-pt.y,moved:false};el.setPointerCapture?.(e.pointerId);el.classList.add('dragging');e.preventDefault();
+ selected=p.id;renderTools();const pt=sceneXY(e,document.getElementById('livingScene'));drag={kind:'placed',origin:{x:p.x,y:p.y},id:e.pointerId,p,el,dx:(p.x??pt.x)-pt.x,dy:(p.y??pt.y)-pt.y,moved:false};el.setPointerCapture?.(e.pointerId);el.classList.add('dragging');e.preventDefault();
 }
 function startInventory(e,b){
  if(mode!=='edit')return;const id=b.dataset.v1810Inv;if(available(id)<1)return;
@@ -96,7 +96,7 @@ function move(e){
 function end(e){
  if(!drag||e.pointerId!==drag.id)return;
  if(drag.kind==='placed'){drag.el.classList.remove('dragging');if(drag.moved)save();else{selected=drag.p.id;renderTools()}}
- else{const scene=document.getElementById('livingScene'),r=scene?.getBoundingClientRect();suppressInventoryClick=drag.moved;if(r&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){const pt=sceneXY(e,scene);place(drag.decor,pt.x,pt.y)}else if(!drag.moved)place(drag.decor)}
+ else{const scene=document.getElementById('livingScene'),r=scene?.getBoundingClientRect();suppressInventoryClick=true;if(r&&e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){const pt=sceneXY(e,scene);place(drag.decor,pt.x,pt.y)}else if(!drag.moved)place(drag.decor)}
  ghost?.remove();ghost=null;drag=null;
 }
 document.addEventListener('click',e=>{
@@ -114,22 +114,9 @@ document.addEventListener('click',e=>{
 const ocean=document.getElementById('ocean');
 if(ocean){
  ocean.addEventListener('pointerdown',e=>{const p=e.target.closest('[data-v1810-placed]');if(p)return startPlaced(e,p);const i=e.target.closest('[data-v1810-inv]');if(i)return startInventory(e,i)},true);
- ocean.addEventListener('pointermove',move,true);ocean.addEventListener('pointerup',end,true);ocean.addEventListener('pointercancel',end,true);
+ ocean.addEventListener('pointermove',move,true);ocean.addEventListener('pointerup',end,true);ocean.addEventListener('pointercancel',()=>{ghost?.remove();ghost=null;if(drag?.kind==='placed'){Object.assign(drag.p,drag.origin);drag.el.style.left=drag.p.x+'%';drag.el.style.top=drag.p.y+'%';drag.el.classList.remove('dragging')}drag=null;suppressInventoryClick=false},true);
  new MutationObserver(()=>{annotate();controls();if(mode==='edit'){ocean.classList.add('v1810Editing');if(!document.getElementById('v1810Tray'))renderTray();renderTopDone()}}).observe(ocean,{childList:true,subtree:true});
 }
-function rescueBottomDecorOnce(){
- const KEY='sharkhabits-v18103-decor-rescue';
- if(localStorage.getItem(KEY))return;
- const candidates=data.placed.filter(p=>(p.y??0)>62);
- candidates.forEach((p,i)=>{
-   /* One-time migration for this release: fan previously trapped bottom
-      decorations into a safe central band so they can be selected again. */
-   p.x=30+(i%3)*20;
-   p.y=34+(Math.floor(i/3)%3)*12;
- });
- localStorage.setItem(KEY,'1');
- if(candidates.length)save();
-}
-repairInventory();rescueBottomDecorOnce();setTimeout(()=>{controls();annotate()},50);
+repairInventory();setTimeout(()=>{controls();annotate()},50);
 window.__v1810={version:'18.10.2',editor,buy,finish,available,removeSelected,validateSelected};
 })();
